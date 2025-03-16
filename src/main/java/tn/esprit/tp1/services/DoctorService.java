@@ -37,4 +37,26 @@ public class DoctorService {
         return doctor.map(d -> d.getPassword().equals(password) ? "Login successful" : "Invalid credentials")
                 .orElse("User not found");
     }
+
+
+    public String completeProfile(String email, String photo, String specialty, String location, String description,
+                                  int numberExperience, int numberPatients, float numberRating) {
+        Optional<Doctor> doctorOptional = doctorRepository.findByEmail(email);
+
+        if (doctorOptional.isPresent()) {
+            Doctor doctor = doctorOptional.get();
+            doctor.setPhoto(photo);
+            doctor.setSpecialty(specialty);
+            doctor.setLocation(location);
+            doctor.setDescription(description);
+            doctor.setNumberExperience(numberExperience);
+            doctor.setNumberPatients(numberPatients);
+            doctor.setNumberRating(numberRating);
+
+            doctorRepository.save(doctor);
+            return "Profile updated successfully!";
+        } else {
+            return "Doctor not found!";
+        }
+    }
 }

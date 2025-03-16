@@ -17,4 +17,12 @@ public class Doctor {
     private String phone;
     private String password;
     private Role role;
+    private String photo;
+    private String specialty;
+    private String location;
+    private String description;
+    private int numberExperience;
+    private int numberPatients;
+    private float numberRating;
 }
+
