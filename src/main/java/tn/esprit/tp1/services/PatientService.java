@@ -18,7 +18,7 @@ public class PatientService {
     private PatientRepository patientRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // Inject PasswordEncoder
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private DoctorRepository doctorRepository;
@@ -29,28 +29,12 @@ public class PatientService {
         if (patientRepository.findByEmail(patient.getEmail()).isPresent()) {
             return "Email already in use!";
         }
-
         // Encrypt password before saving
         patient.setPassword(passwordEncoder.encode(patient.getPassword()));
-
         patientRepository.save(patient);
         return "Patient registered successfully!";
     }
 
-    /*public String loginPatient(String email, String rawPassword, Role role) {
-        Patient patient = patientRepository.findByEmail(email).orElse(null);
-
-        if (patient == null) {
-            return "User not found!";
-        }
-
-        // Compare encrypted password
-        if (passwordEncoder.matches(rawPassword, patient.getPassword())) {
-            return "Login successful!";
-        } else {
-            return "Invalid credentials!";
-        }
-    }*/
 
     public String login(String email, String rawPassword, Role role) {
         switch (role) {

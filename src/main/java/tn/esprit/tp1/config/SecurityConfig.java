@@ -15,14 +15,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .authorizeHttpRequests()
+                .anyRequest().permitAll()
+                .and()
+                .csrf().disable();
+        return http.build();
+                /*
                 .authorizeRequests()
-                .requestMatchers("/doctor/signup", "/patient/signup", "/admin/signup", "/patient/login", "/doctor/login", "/admin/login", "/conversations/start","/conversations/send-message", "/conversations/user/**")
+                .requestMatchers("/doctor/signup", "/patient/signup", "/admin/signup", "/patient/login", "/doctor/login", "/admin/login", "/conversations/start","/conversations/send-message", "/conversations/user/**", "/doctor/complete-profile","/doctor/**")
                 .permitAll() // Allow signup and login endpoints without authentication
                 .anyRequest()
                 .authenticated() // Require authentication for other endpoints
                 .and()
                 .csrf().disable(); // Disable CSRF for testing purposes (you should configure CSRF properly in production)
-        return http.build();
+        return http.build();*/
     }
 
     @Bean

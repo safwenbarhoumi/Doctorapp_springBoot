@@ -23,6 +23,7 @@ public class DoctorController {
         return doctorService.loginDoctor(request.getEmail(), request.getPassword());
     }
 
+    /*
     @PutMapping("/complete-profile")
     public String completeProfile(@RequestParam String email,
                                   @RequestParam String photo,
@@ -33,5 +34,19 @@ public class DoctorController {
                                   @RequestParam int numberPatients,
                                   @RequestParam float numberRating) {
         return doctorService.completeProfile(email, photo, specialty, location, description, numberExperience, numberPatients, numberRating);
+    }*/
+
+    @PutMapping("/complete-profile")
+    public String completeProfile(@RequestBody Doctor doctor) {
+        return doctorService.completeProfile(
+                doctor.getEmail(),
+                doctor.getPhoto(),
+                doctor.getSpecialty(),
+                doctor.getLocation(),
+                doctor.getDescription(),
+                doctor.getNumberExperience(),
+                doctor.getNumberPatients(),
+                doctor.getNumberRating()
+        );
     }
 }
