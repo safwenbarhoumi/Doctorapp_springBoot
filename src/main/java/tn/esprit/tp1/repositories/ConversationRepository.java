@@ -10,9 +10,10 @@ import java.util.Optional;
 public interface ConversationRepository extends MongoRepository<Conversation, String> {
     // List<Conversation> findByDoctorIdOrPatientId(String doctorId, String patientId);
     Optional<Conversation> findByDoctorEmailAndPatientEmail(String doctorEmail, String patientEmail);
-    List<Conversation> findByDoctorEmailOrPatientEmail(String doctorEmail, String patientEmail);
 
     @Query("{ $or: [ { 'doctorEmail': ?0 }, { 'patientEmail': ?0 } ] }")
     List<Conversation> findByUserEmail(String email);
+
+
 
 }

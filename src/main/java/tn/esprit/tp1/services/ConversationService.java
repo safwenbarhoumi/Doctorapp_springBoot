@@ -22,21 +22,10 @@ public class ConversationService {
     @Autowired
     private PatientRepository patientRepository;
 
-    /*
-    public String startConversation(String doctorId, String patientId, String doctorPhoto, String patientPhoto) {
-        Optional<Conversation> existingConversation = conversationRepository.findByDoctorEmailAndPatientEmail(doctorId, patientId);
-        if (existingConversation.isPresent()) {
-            return "Conversation already exists!";
-        }
-        Conversation conversation = new Conversation();
-        conversation.setDoctorId(doctorId);
-        conversation.setPatientId(patientId);
-        conversation.setDoctorPhoto(doctorPhoto);
-        conversation.setPatientPhoto(patientPhoto);
-        conversation.setLastMessageTime(new Date());
-        conversationRepository.save(conversation);
-        return "Conversation started successfully!";
-    }*/
+
+    public List<Conversation> getAllConversationsByUserEmail(String email) {
+        return conversationRepository.findByUserEmail(email);
+    }
 
     public String startConversation(String senderEmail, String receiverEmail, String doctorPhoto, String patientPhoto) {
         // Check if conversation already exists
@@ -60,6 +49,7 @@ public class ConversationService {
     }
 
 
+    /*
     public MessageResponse sendMessage(String senderEmail, String receiverEmail, String content, MessageType type) {
         Optional<Conversation> existingConversation = conversationRepository.findByDoctorEmailAndPatientEmail(senderEmail, receiverEmail);
         Conversation conversation = existingConversation.orElseGet(() -> {
@@ -76,17 +66,33 @@ public class ConversationService {
         conversation.getMessages().add(newMessage);
         conversationRepository.save(conversation);
         return new MessageResponse(conversation.getId(), "Message sent successfully!");
-    }
-
-    /*
-    public List<Conversation> getAllConversationsForUser(String userId) {
-        return conversationRepository.findByDoctorIdOrPatientId(userId, userId);
     }*/
 
-    public List<Conversation> getAllConversationsForUser(String email) {
-        System.out.println("Fetching conversations for email: " + email);
-        return conversationRepository.findByUserEmail(email);
+    public MessageResponse sendMessage(String senderEmail, String receiverEmail, String content, MessageType type) {
+        Optional<Conversation> existingConversation = conversationRepository.findByDoctorEmailAndPatientEmail(senderEmail, receiverEmail);
+        Conversation conversation = existingConversation.orElseGet(() -> {
+            Conversation newConv = new Conversation();
+            newConv.setDoctorEmail(senderEmail);
+            newConv.setPatientEmail(receiverEmail);
+            return conversationRepository.save(newConv);
+        });
+
+        Message newMessage = new Message();
+        newMessage.setSenderEmail(senderEmail);
+        newMessage.setContent(content);
+        newMessage.setMessageType(type);
+        newMessage.setTimestamp(LocalDateTime.now());
+
+        conversation.getMessages().add(newMessage);
+        conversation.setLastMessageTime(new Date());
+        conversation.setLastMessageContent(content);
+        conversation.setLastMessageSender(senderEmail);
+
+        conversationRepository.save(conversation);
+        return new MessageResponse(conversation.getId(), "Message sent successfully!");
     }
+
+
 
     public List<Message> getMessagesByConversationId(String conversationId) {
         return conversationRepository.findById(conversationId).map(Conversation::getMessages).orElse(Collections.emptyList());

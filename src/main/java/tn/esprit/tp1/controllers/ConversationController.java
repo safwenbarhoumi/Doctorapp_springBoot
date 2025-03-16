@@ -18,18 +18,12 @@ public class ConversationController {
     @Autowired
     private ConversationService conversationService;
 
-    @PostMapping("/AllConversationOfUser")
-    public List<Conversation> getAllConversationsForUser(@RequestBody String userEmail ) {
-        ///userEmail = request.get("usermail");
-        return conversationService.getAllConversationsForUser(userEmail);
-    }
 
-    /*
-    @PostMapping("/start")
-    public String startConversation(@RequestParam String doctorId, @RequestParam String patientId,
-                                    @RequestParam String doctorPhoto, @RequestParam String patientPhoto) {
-        return conversationService.startConversation(doctorId, patientId, doctorPhoto, patientPhoto);
-    }*/
+    @GetMapping("/user/{email}")
+    public ResponseEntity<List<Conversation>> getAllConversationsByUser(@PathVariable String email) {
+        List<Conversation> conversations = conversationService.getAllConversationsByUserEmail(email);
+        return ResponseEntity.ok(conversations);
+    }
 
     @PostMapping("/start")
     public String startConversation(@RequestParam String senderEmail,
@@ -48,11 +42,7 @@ public class ConversationController {
         MessageResponse response = conversationService.sendMessage(senderEmail, receiverEmail, content, type);
         return ResponseEntity.ok(response);
     }
-    /*
-    @GetMapping("/user/{userId}")
-    public List<Conversation> getAllConversationsForUser(@PathVariable String userId) {
-        return conversationService.getAllConversationsForUser(userId);
-    }*/
+
 
     @GetMapping("/{conversationId}")
     public List<Message> getMessagesByConversationId(@PathVariable String conversationId) {

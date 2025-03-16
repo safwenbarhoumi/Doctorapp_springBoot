@@ -16,7 +16,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .requestMatchers("/doctor/signup", "/patient/signup", "/admin/signup", "/patient/login", "/doctor/login", "/admin/login", "/conversations/start","/conversations/send-message", "/conversations/AllConversationOfUser")
+                .requestMatchers("/doctor/signup", "/patient/signup", "/admin/signup", "/patient/login", "/doctor/login", "/admin/login", "/conversations/start","/conversations/send-message", "/conversations/user/**")
                 .permitAll() // Allow signup and login endpoints without authentication
                 .anyRequest()
                 .authenticated() // Require authentication for other endpoints
