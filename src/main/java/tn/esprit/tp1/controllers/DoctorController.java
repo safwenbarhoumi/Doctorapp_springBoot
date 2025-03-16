@@ -1,7 +1,9 @@
 package tn.esprit.tp1.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.tp1.auth.dto.LoginRequest;
 import tn.esprit.tp1.entities.Doctor;
 import tn.esprit.tp1.services.DoctorService;
@@ -36,11 +38,15 @@ public class DoctorController {
         return doctorService.completeProfile(email, photo, specialty, location, description, numberExperience, numberPatients, numberRating);
     }*/
 
-    @PutMapping("/complete-profile")
-    public String completeProfile(@RequestBody Doctor doctor) {
+    @PostMapping(value = "/doctor/complete-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String completeProfile(
+            @RequestPart("doctor") Doctor doctor,
+            @RequestPart("photo") MultipartFile photo) {
+
+        // Appel à ton service pour compléter le profil avec les données reçues
         return doctorService.completeProfile(
                 doctor.getEmail(),
-                doctor.getPhoto(),
+                String.valueOf(photo),
                 doctor.getSpecialty(),
                 doctor.getLocation(),
                 doctor.getDescription(),
@@ -49,4 +55,5 @@ public class DoctorController {
                 doctor.getNumberRating()
         );
     }
+
 }
