@@ -24,5 +24,10 @@ public class Doctor {
     private int numberExperience;
     private int numberPatients;
     private float numberRating;
+    private boolean profileCompleted;
+
+
+    public boolean isProfileCompleted() { return profileCompleted; }
+    public void setProfileCompleted(boolean profileCompleted) { this.profileCompleted = profileCompleted; }
 }
 

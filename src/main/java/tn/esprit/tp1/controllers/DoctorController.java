@@ -1,12 +1,18 @@
 package tn.esprit.tp1.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.tp1.auth.dto.LoginRequest;
 import tn.esprit.tp1.entities.Doctor;
 import tn.esprit.tp1.services.DoctorService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/doctor")
@@ -14,6 +20,10 @@ public class DoctorController {
 
     @Autowired
     private DoctorService doctorService;
+
+    public DoctorController(DoctorService doctorService) {
+        this.doctorService = doctorService;
+    }
 
     @PostMapping("/signup")
     public String signup(@RequestBody Doctor doctor) {
@@ -25,35 +35,50 @@ public class DoctorController {
         return doctorService.loginDoctor(request.getEmail(), request.getPassword());
     }
 
-    /*
-    @PutMapping("/complete-profile")
-    public String completeProfile(@RequestParam String email,
-                                  @RequestParam String photo,
-                                  @RequestParam String specialty,
-                                  @RequestParam String location,
-                                  @RequestParam String description,
-                                  @RequestParam int numberExperience,
-                                  @RequestParam int numberPatients,
-                                  @RequestParam float numberRating) {
-        return doctorService.completeProfile(email, photo, specialty, location, description, numberExperience, numberPatients, numberRating);
-    }*/
 
-    @PostMapping(value = "/doctor/complete-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String completeProfile(
-            @RequestPart("doctor") Doctor doctor,
-            @RequestPart("photo") MultipartFile photo) {
+    @PostMapping("/complete-profile")
+    public ResponseEntity<String> completeProfile(
+            @RequestParam("email") String email,
+            @RequestParam("specialty") String specialty,
+            @RequestParam("location") String location,
+            @RequestParam("description") String description,
+            @RequestParam("numberExperience") int numberExperience,
+            @RequestParam("numberPatients") int numberPatients) {
 
-        // Appel à ton service pour compléter le profil avec les données reçues
-        return doctorService.completeProfile(
-                doctor.getEmail(),
-                String.valueOf(photo),
-                doctor.getSpecialty(),
-                doctor.getLocation(),
-                doctor.getDescription(),
-                doctor.getNumberExperience(),
-                doctor.getNumberPatients(),
-                doctor.getNumberRating()
-        );
+        Optional<Doctor> doctorOptional = doctorService.findByEmail(email);
+
+        if (doctorOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("Doctor not found!");
+        }
+
+        Doctor doctor = doctorOptional.get();
+        doctor.setSpecialty(specialty);
+        doctor.setLocation(location);
+        doctor.setDescription(description);
+        doctor.setNumberExperience(numberExperience);
+        doctor.setNumberPatients(numberPatients);
+        doctor.setProfileCompleted(true);
+
+        doctorService.updateDoctor(doctor);
+
+        return ResponseEntity.ok("Profile updated successfully!");
+    }
+
+
+
+    @GetMapping("/details/{email}")
+    public ResponseEntity<Doctor> getDoctorDetails(@PathVariable String email) {
+        return ResponseEntity.ok(doctorService.getDoctorDetails(email));
+    }
+
+    @GetMapping("/top10")
+    public ResponseEntity<List<Map<String, Object>>> getTop10Doctors() {
+        return ResponseEntity.ok(doctorService.getTop10Doctors());
+    }
+
+    @GetMapping("/category/{specialty}")
+    public ResponseEntity<List<Map<String, Object>>> getDoctorsByCategory(@PathVariable String specialty) {
+        return ResponseEntity.ok(doctorService.getDoctorsByCategory(specialty));
     }
 
 }
