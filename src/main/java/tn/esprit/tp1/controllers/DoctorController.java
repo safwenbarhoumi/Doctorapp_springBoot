@@ -39,11 +39,7 @@ public class DoctorController {
     @PostMapping("/complete-profile")
     public ResponseEntity<String> completeProfile(
             @RequestParam("email") String email,
-            @RequestParam("specialty") String specialty,
-            @RequestParam("location") String location,
-            @RequestParam("description") String description,
-            @RequestParam("numberExperience") int numberExperience,
-            @RequestParam("numberPatients") int numberPatients) {
+            @RequestBody Doctor profileData) {
 
         Optional<Doctor> doctorOptional = doctorService.findByEmail(email);
 
@@ -52,17 +48,18 @@ public class DoctorController {
         }
 
         Doctor doctor = doctorOptional.get();
-        doctor.setSpecialty(specialty);
-        doctor.setLocation(location);
-        doctor.setDescription(description);
-        doctor.setNumberExperience(numberExperience);
-        doctor.setNumberPatients(numberPatients);
+        doctor.setSpecialty(profileData.getSpecialty());
+        doctor.setLocation(profileData.getLocation());
+        doctor.setDescription(profileData.getDescription());
+        doctor.setNumberExperience(profileData.getNumberExperience());
+        doctor.setNumberPatients(profileData.getNumberPatients());
         doctor.setProfileCompleted(true);
 
         doctorService.updateDoctor(doctor);
 
         return ResponseEntity.ok("Profile updated successfully!");
     }
+
 
 
 
@@ -79,6 +76,11 @@ public class DoctorController {
     @GetMapping("/category/{specialty}")
     public ResponseEntity<List<Map<String, Object>>> getDoctorsByCategory(@PathVariable String specialty) {
         return ResponseEntity.ok(doctorService.getDoctorsByCategory(specialty));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Doctor>> getAllDoctors() {
+        return ResponseEntity.ok(doctorService.getAllDoctors());
     }
 
 }

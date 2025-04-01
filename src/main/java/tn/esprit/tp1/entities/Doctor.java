@@ -27,7 +27,7 @@ public class Doctor {
     private boolean profileCompleted;
 
 
-    public boolean isProfileCompleted() { return profileCompleted; }
+    // public boolean isProfileCompleted() { return profileCompleted; }
     public void setProfileCompleted(boolean profileCompleted) { this.profileCompleted = profileCompleted; }
 }
 

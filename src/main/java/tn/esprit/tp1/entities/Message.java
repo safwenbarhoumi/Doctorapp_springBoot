@@ -19,4 +19,6 @@ public class Message {
     private String content;
     private MessageType messageType;
     private LocalDateTime timestamp;
+    private String timestampFormatted;
+    private String senderName;
 }

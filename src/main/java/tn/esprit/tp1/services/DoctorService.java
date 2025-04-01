@@ -27,7 +27,6 @@ public class DoctorService {
         this.doctorRepository = doctorRepository;
     }
 
-
     public String registerDoctor(Doctor doctor) {
         if (doctorRepository.findByEmail(doctor.getEmail()).isPresent()) {
             return "Email already in use!";
@@ -38,9 +37,8 @@ public class DoctorService {
     }
 
     public void updateDoctor(Doctor doctor) {
-        doctorRepository.save(doctor); // Cette ligne met bien à jour les données en base
+        doctorRepository.save(doctor);
     }
-
 
     public String loginDoctor(String email, String password) {
         Optional<Doctor> doctor = doctorRepository.findByEmail(email);
@@ -57,12 +55,10 @@ public class DoctorService {
         }
     }
 
-
     public Doctor getDoctorDetails(String email) {
         return doctorRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Doctor not found!"));
     }
-
 
     public Optional<Doctor> findByEmail(String email) {
         return doctorRepository.findByEmail(email);
@@ -70,8 +66,7 @@ public class DoctorService {
 
     public void completeDoctorProfile(Doctor doctor) {
         // Mettre à jour les informations du docteur
-        doctor.setProfileCompleted(true); // Exemple de mise à jour d'un champ
-
+        doctor.setProfileCompleted(true);
         // Enregistrer les modifications
         doctorRepository.save(doctor);
     }
@@ -87,8 +82,6 @@ public class DoctorService {
         return fileName; // Retourne le nom du fichier enregistré
     }
 
-
-
     public List<Map<String, Object>> getTop10Doctors() {
         return doctorRepository.findAll().stream()
                 .sorted(Comparator.comparingDouble(Doctor::getNumberRating).reversed())
@@ -99,6 +92,10 @@ public class DoctorService {
                     doctorMap.put("photo", doctor.getPhoto());
                     doctorMap.put("rating", doctor.getNumberRating());
                     doctorMap.put("specialty", doctor.getSpecialty());
+                    doctorMap.put("description", doctor.getDescription());
+                    doctorMap.put("numberPatients", doctor.getNumberPatients());
+                    doctorMap.put("numberExperience", doctor.getNumberExperience());
+                    doctorMap.put("location", doctor.getLocation());
                     return doctorMap;
                 })
                 .collect(Collectors.toList());
@@ -112,10 +109,17 @@ public class DoctorService {
                     doctorMap.put("photo", doctor.getPhoto());
                     doctorMap.put("rating", doctor.getNumberRating());
                     doctorMap.put("specialty", doctor.getSpecialty());
+                    doctorMap.put("description", doctor.getDescription());
+                    doctorMap.put("numberPatients", doctor.getNumberPatients());
+                    doctorMap.put("numberExperience", doctor.getNumberExperience());
+                    doctorMap.put("location", doctor.getLocation());
                     return doctorMap;
                 })
                 .collect(Collectors.toList());
     }
 
+    public List<Doctor> getAllDoctors() {
+        return doctorRepository.findAll();
+    }
 
 }

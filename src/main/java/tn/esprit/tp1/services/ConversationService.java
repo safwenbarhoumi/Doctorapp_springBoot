@@ -8,6 +8,8 @@ import tn.esprit.tp1.repositories.DoctorRepository;
 import tn.esprit.tp1.repositories.PatientRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -22,13 +24,18 @@ public class ConversationService {
     @Autowired
     private PatientRepository patientRepository;
 
+    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
 
     public List<Conversation> getAllConversationsByUserEmail(String email) {
-        return conversationRepository.findByUserEmail(email);
+        List<Conversation> conversations = conversationRepository.findByUserEmail(email);
+        for (Conversation conversation : conversations) {
+            conversation.setLastMessageTimeFormatted(timeFormatter.format(conversation.getLastMessageTime().toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDateTime()));
+        }
+        return conversations;
     }
 
     public String startConversation(String senderEmail, String receiverEmail, String doctorPhoto, String patientPhoto) {
-        // Check if conversation already exists
         Optional<Conversation> existingConversation = conversationRepository
                 .findByDoctorEmailAndPatientEmail(senderEmail, receiverEmail);
 
@@ -36,40 +43,21 @@ public class ConversationService {
             return "Conversation already exists!";
         }
 
-        // Create a new conversation
         Conversation conversation = new Conversation();
         conversation.setDoctorEmail(senderEmail);
         conversation.setPatientEmail(receiverEmail);
         conversation.setDoctorPhoto(doctorPhoto);
         conversation.setPatientPhoto(patientPhoto);
         conversation.setLastMessageTime(new Date());
+        conversation.setLastMessageTimeFormatted(timeFormatter.format(LocalDateTime.now()));
 
         conversationRepository.save(conversation);
         return "Conversation started successfully!";
     }
 
-
-    /*
     public MessageResponse sendMessage(String senderEmail, String receiverEmail, String content, MessageType type) {
-        Optional<Conversation> existingConversation = conversationRepository.findByDoctorEmailAndPatientEmail(senderEmail, receiverEmail);
-        Conversation conversation = existingConversation.orElseGet(() -> {
-            Conversation newConv = new Conversation();
-            newConv.setDoctorEmail(senderEmail);
-            newConv.setPatientEmail(receiverEmail);
-            return conversationRepository.save(newConv);
-        });
-        Message newMessage = new Message();
-        newMessage.setSenderEmail(senderEmail);
-        newMessage.setContent(content);
-        newMessage.setMessageType(type);
-        newMessage.setTimestamp(LocalDateTime.now());
-        conversation.getMessages().add(newMessage);
-        conversationRepository.save(conversation);
-        return new MessageResponse(conversation.getId(), "Message sent successfully!");
-    }*/
-
-    public MessageResponse sendMessage(String senderEmail, String receiverEmail, String content, MessageType type) {
-        Optional<Conversation> existingConversation = conversationRepository.findByDoctorEmailAndPatientEmail(senderEmail, receiverEmail);
+        Optional<Conversation> existingConversation = conversationRepository
+                .findByDoctorEmailAndPatientEmail(senderEmail, receiverEmail);
         Conversation conversation = existingConversation.orElseGet(() -> {
             Conversation newConv = new Conversation();
             newConv.setDoctorEmail(senderEmail);
@@ -81,10 +69,18 @@ public class ConversationService {
         newMessage.setSenderEmail(senderEmail);
         newMessage.setContent(content);
         newMessage.setMessageType(type);
+        newMessage.setTimestampFormatted(timeFormatter.format(LocalDateTime.now()));
         newMessage.setTimestamp(LocalDateTime.now());
+
+        Optional<Doctor> doctor = doctorRepository.findByEmail(senderEmail);
+        Optional<Patient> patient = patientRepository.findByEmail(senderEmail);
+        String senderName = doctor.map(d -> d.getFirstName() + " " + d.getLastName())
+                .orElseGet(() -> patient.map(p -> p.getFirstName() + " " + p.getLastName()).orElse("Unknown"));
+        newMessage.setSenderName(senderName);
 
         conversation.getMessages().add(newMessage);
         conversation.setLastMessageTime(new Date());
+        conversation.setLastMessageTimeFormatted(timeFormatter.format(LocalDateTime.now()));
         conversation.setLastMessageContent(content);
         conversation.setLastMessageSender(senderEmail);
 
@@ -92,9 +88,12 @@ public class ConversationService {
         return new MessageResponse(conversation.getId(), "Message sent successfully!");
     }
 
-
-
     public List<Message> getMessagesByConversationId(String conversationId) {
-        return conversationRepository.findById(conversationId).map(Conversation::getMessages).orElse(Collections.emptyList());
+        return conversationRepository.findById(conversationId).map(conversation -> {
+            for (Message message : conversation.getMessages()) {
+                message.setTimestampFormatted(timeFormatter.format(message.getTimestamp()));
+            }
+            return conversation.getMessages();
+        }).orElse(Collections.emptyList());
     }
 }

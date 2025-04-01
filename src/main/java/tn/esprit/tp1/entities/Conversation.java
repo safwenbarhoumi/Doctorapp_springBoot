@@ -25,4 +25,5 @@ public class Conversation {
     private String doctorEmail;
     private String patientEmail;
     private List<Message> messages = new ArrayList<>();
+    private String lastMessageTimeFormatted;
 }
