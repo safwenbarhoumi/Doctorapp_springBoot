@@ -45,7 +45,7 @@ public class DoctorService {
 
         if (doctor.isPresent()) {
             Doctor d = doctor.get();
-            if (passwordEncoder.matches(password, d.getPassword())) { // Vérifier le mot de passe haché
+            if (passwordEncoder.matches(password, d.getPassword())) {
                 return "Login successful";
             } else {
                 return "Invalid credentials";
@@ -65,61 +65,146 @@ public class DoctorService {
     }
 
     public void completeDoctorProfile(Doctor doctor) {
-        // Mettre à jour les informations du docteur
         doctor.setProfileCompleted(true);
-        // Enregistrer les modifications
         doctorRepository.save(doctor);
     }
 
     public String saveDoctorPhoto(MultipartFile photo) throws IOException {
         String fileName = UUID.randomUUID().toString() + "_" + photo.getOriginalFilename();
         Path photoPath = Paths.get("uploads/doctors/" + fileName);
-
-        // Créer le dossier s'il n'existe pas
         Files.createDirectories(photoPath.getParent());
         Files.write(photoPath, photo.getBytes());
-
-        return fileName; // Retourne le nom du fichier enregistré
+        return fileName;
     }
 
-    public List<Map<String, Object>> getTop10Doctors() {
+    // ✅ Updated: Return full Doctor objects for Flutter
+    public List<Doctor> getTop10Doctors() {
         return doctorRepository.findAll().stream()
                 .sorted(Comparator.comparingDouble(Doctor::getNumberRating).reversed())
                 .limit(10)
-                .map(doctor -> {
-                    Map<String, Object> doctorMap = new HashMap<>();
-                    doctorMap.put("name", doctor.getFirstName() + " " + doctor.getLastName());
-                    doctorMap.put("photo", doctor.getPhoto());
-                    doctorMap.put("rating", doctor.getNumberRating());
-                    doctorMap.put("specialty", doctor.getSpecialty());
-                    doctorMap.put("description", doctor.getDescription());
-                    doctorMap.put("numberPatients", doctor.getNumberPatients());
-                    doctorMap.put("numberExperience", doctor.getNumberExperience());
-                    doctorMap.put("location", doctor.getLocation());
-                    return doctorMap;
-                })
                 .collect(Collectors.toList());
     }
 
-    public List<Map<String, Object>> getDoctorsByCategory(String specialty) {
-        return doctorRepository.findBySpecialty(specialty).stream()
-                .map(doctor -> {
-                    Map<String, Object> doctorMap = new HashMap<>();
-                    doctorMap.put("name", doctor.getFirstName() + " " + doctor.getLastName());
-                    doctorMap.put("photo", doctor.getPhoto());
-                    doctorMap.put("rating", doctor.getNumberRating());
-                    doctorMap.put("specialty", doctor.getSpecialty());
-                    doctorMap.put("description", doctor.getDescription());
-                    doctorMap.put("numberPatients", doctor.getNumberPatients());
-                    doctorMap.put("numberExperience", doctor.getNumberExperience());
-                    doctorMap.put("location", doctor.getLocation());
-                    return doctorMap;
-                })
-                .collect(Collectors.toList());
+    // ✅ Updated: Return full Doctor objects
+    public List<Doctor> getDoctorsByCategory(String specialty) {
+        return doctorRepository.findBySpecialty(specialty);
     }
 
     public List<Doctor> getAllDoctors() {
         return doctorRepository.findAll();
     }
-
 }
+
+/*
+ * @Service
+ * public class DoctorService {
+ * 
+ * @Autowired
+ * private DoctorRepository doctorRepository;
+ * 
+ * @Autowired
+ * private PasswordEncoder passwordEncoder;
+ * 
+ * public DoctorService(DoctorRepository doctorRepository) {
+ * this.doctorRepository = doctorRepository;
+ * }
+ * 
+ * public String registerDoctor(Doctor doctor) {
+ * if (doctorRepository.findByEmail(doctor.getEmail()).isPresent()) {
+ * return "Email already in use!";
+ * }
+ * doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
+ * doctorRepository.save(doctor);
+ * return "Doctor registered successfully!";
+ * }
+ * 
+ * public void updateDoctor(Doctor doctor) {
+ * doctorRepository.save(doctor);
+ * }
+ * 
+ * public String loginDoctor(String email, String password) {
+ * Optional<Doctor> doctor = doctorRepository.findByEmail(email);
+ * 
+ * if (doctor.isPresent()) {
+ * Doctor d = doctor.get();
+ * if (passwordEncoder.matches(password, d.getPassword())) { // Vérifier le mot
+ * de passe haché
+ * return "Login successful";
+ * } else {
+ * return "Invalid credentials";
+ * }
+ * } else {
+ * return "User not found";
+ * }
+ * }
+ * 
+ * public Doctor getDoctorDetails(String email) {
+ * return doctorRepository.findByEmail(email)
+ * .orElseThrow(() -> new RuntimeException("Doctor not found!"));
+ * }
+ * 
+ * public Optional<Doctor> findByEmail(String email) {
+ * return doctorRepository.findByEmail(email);
+ * }
+ * 
+ * public void completeDoctorProfile(Doctor doctor) {
+ * // Mettre à jour les informations du docteur
+ * doctor.setProfileCompleted(true);
+ * // Enregistrer les modifications
+ * doctorRepository.save(doctor);
+ * }
+ * 
+ * public String saveDoctorPhoto(MultipartFile photo) throws IOException {
+ * String fileName = UUID.randomUUID().toString() + "_" +
+ * photo.getOriginalFilename();
+ * Path photoPath = Paths.get("uploads/doctors/" + fileName);
+ * 
+ * // Créer le dossier s'il n'existe pas
+ * Files.createDirectories(photoPath.getParent());
+ * Files.write(photoPath, photo.getBytes());
+ * 
+ * return fileName; // Retourne le nom du fichier enregistré
+ * }
+ * 
+ * public List<Map<String, Object>> getTop10Doctors() {
+ * return doctorRepository.findAll().stream()
+ * .sorted(Comparator.comparingDouble(Doctor::getNumberRating).reversed())
+ * .limit(10)
+ * .map(doctor -> {
+ * Map<String, Object> doctorMap = new HashMap<>();
+ * doctorMap.put("name", doctor.getFirstName() + " " + doctor.getLastName());
+ * doctorMap.put("photo", doctor.getPhoto());
+ * doctorMap.put("rating", doctor.getNumberRating());
+ * doctorMap.put("specialty", doctor.getSpecialty());
+ * doctorMap.put("description", doctor.getDescription());
+ * doctorMap.put("numberPatients", doctor.getNumberPatients());
+ * doctorMap.put("numberExperience", doctor.getNumberExperience());
+ * doctorMap.put("location", doctor.getLocation());
+ * return doctorMap;
+ * })
+ * .collect(Collectors.toList());
+ * }
+ * 
+ * public List<Map<String, Object>> getDoctorsByCategory(String specialty) {
+ * return doctorRepository.findBySpecialty(specialty).stream()
+ * .map(doctor -> {
+ * Map<String, Object> doctorMap = new HashMap<>();
+ * doctorMap.put("name", doctor.getFirstName() + " " + doctor.getLastName());
+ * doctorMap.put("photo", doctor.getPhoto());
+ * doctorMap.put("rating", doctor.getNumberRating());
+ * doctorMap.put("specialty", doctor.getSpecialty());
+ * doctorMap.put("description", doctor.getDescription());
+ * doctorMap.put("numberPatients", doctor.getNumberPatients());
+ * doctorMap.put("numberExperience", doctor.getNumberExperience());
+ * doctorMap.put("location", doctor.getLocation());
+ * return doctorMap;
+ * })
+ * .collect(Collectors.toList());
+ * }
+ * 
+ * public List<Doctor> getAllDoctors() {
+ * return doctorRepository.findAll();
+ * }
+ * 
+ * }
+ */

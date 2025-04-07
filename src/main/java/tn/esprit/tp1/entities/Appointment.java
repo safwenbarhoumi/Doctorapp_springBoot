@@ -1,5 +1,8 @@
 package tn.esprit.tp1.entities;
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +17,8 @@ public class Appointment {
     private String date;
     private String time;
 
+    // private LocalDateTime createdAt;
+
     public Appointment() {
         // Default constructor
     }
@@ -24,9 +29,18 @@ public class Appointment {
         this.patientId = patientId;
         this.date = date;
         this.time = time;
+        // this.createdAt = LocalDateTime.now();
     }
 
-    // Getters and Setters...
+    /*
+     * public LocalDateTime getCreatedAt() {
+     * return createdAt;
+     * }
+     * 
+     * public void setCreatedAt(LocalDateTime createdAt) {
+     * this.createdAt = createdAt;
+     * }
+     */
 
     public String getId() {
         return id;

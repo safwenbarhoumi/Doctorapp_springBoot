@@ -35,8 +35,49 @@ public class PatientService {
         return "Patient registered successfully!";
     }
 
+    // public String login(String email, String rawPassword, Role role) {
+    // switch (role) {
+    // case PATIENT:
+    // return authenticateUser(patientRepository.findByEmail(email).orElse(null),
+    // rawPassword);
+    // case DOCTOR:
+    // return authenticateUser(doctorRepository.findByEmail(email).orElse(null),
+    // rawPassword);
+    // case ADMIN:
+    // return authenticateUser(adminRepository.findByEmail(email).orElse(null),
+    // rawPassword);
+    // default:
+    // return "Invalid role!";
+    // }
+    // }
 
-    public String login(String email, String rawPassword, Role role) {
+    // private String authenticateUser(Object user, String rawPassword) {
+    // if (user == null) {
+    // return "User not found!";
+    // }
+
+    // // Vérifiez si l'objet a bien un champ "password"
+    // if (user instanceof Patient) {
+    // Patient patient = (Patient) user;
+    // return passwordEncoder.matches(rawPassword, patient.getPassword()) ? "Login
+    // successful!"
+    // : "Invalid credentials!";
+    // } else if (user instanceof Doctor) {
+    // Doctor doctor = (Doctor) user;
+    // return passwordEncoder.matches(rawPassword, doctor.getPassword()) ? "Login
+    // successful!"
+    // : "Invalid credentials!";
+    // } else if (user instanceof Admin) {
+    // Admin admin = (Admin) user;
+    // return passwordEncoder.matches(rawPassword, admin.getPassword()) ? "Login
+    // successful!"
+    // : "Invalid credentials!";
+    // }
+
+    // return "Invalid user type!";
+    // }
+
+    public Object login(String email, String rawPassword, Role role) {
         switch (role) {
             case PATIENT:
                 return authenticateUser(patientRepository.findByEmail(email).orElse(null), rawPassword);
@@ -45,33 +86,27 @@ public class PatientService {
             case ADMIN:
                 return authenticateUser(adminRepository.findByEmail(email).orElse(null), rawPassword);
             default:
-                return "Invalid role!";
+                return null; // or throw new IllegalArgumentException("Invalid role!");
         }
     }
 
-
-    private String authenticateUser(Object user, String rawPassword) {
+    private Object authenticateUser(Object user, String rawPassword) {
         if (user == null) {
-            return "User not found!";
+            return null;
         }
 
-        // Vérifiez si l'objet a bien un champ "password"
         if (user instanceof Patient) {
             Patient patient = (Patient) user;
-            return passwordEncoder.matches(rawPassword, patient.getPassword()) ? "Login successful!" : "Invalid credentials!";
+            return passwordEncoder.matches(rawPassword, patient.getPassword()) ? patient : null;
         } else if (user instanceof Doctor) {
             Doctor doctor = (Doctor) user;
-            return passwordEncoder.matches(rawPassword, doctor.getPassword()) ? "Login successful!" : "Invalid credentials!";
+            return passwordEncoder.matches(rawPassword, doctor.getPassword()) ? doctor : null;
         } else if (user instanceof Admin) {
             Admin admin = (Admin) user;
-            return passwordEncoder.matches(rawPassword, admin.getPassword()) ? "Login successful!" : "Invalid credentials!";
+            return passwordEncoder.matches(rawPassword, admin.getPassword()) ? admin : null;
         }
 
-        return "Invalid user type!";
+        return null;
     }
-
-
-
-
 
 }

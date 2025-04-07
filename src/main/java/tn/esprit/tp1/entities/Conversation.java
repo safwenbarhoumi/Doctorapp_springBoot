@@ -15,6 +15,7 @@ import java.util.Date;
 public class Conversation {
     @Id
     private String id;
+
     private String doctorId;
     private String patientId;
     private Date lastMessageTime;

@@ -2,6 +2,7 @@ package tn.esprit.tp1.entities;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,10 @@ public class Doctor {
     private String phone;
     private String password;
     private String role;
+
+    @Field("photo_path")
     private String photo;
+
     private String specialty;
     private String location;
     private String description;
